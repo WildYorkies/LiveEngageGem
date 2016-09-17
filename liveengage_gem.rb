@@ -3,13 +3,6 @@ require 'oauth'
 require 'json'
 #require 'open-uri'
 require 'net/http'
-#require 'openssl'
-#OpenSSL::SSL::VERIFY_PEER = OpenSSL::SSL::VERIFY_NONE
-
-#consumer_key = 'f'
-#consumer_secret = 'f'
-#access_token = 'd'
-#access_token_secret = 's'
 
 #consumer = OAuth::Consumer.new(consumer_key, consumer_secret, {:site=>'http://my.site'})
 #accesstoken = OAuth::AccessToken.new(consumer, access_token, access_token_secret)
@@ -40,11 +33,16 @@ class EngagementHistory < Service
     def initialize
         super('engHistDomain')
     end
+    def post(from = nil, to  = nil)
+
+    end
 end
 
 class OperationalRealTime < Service
     def initialize
         super('leDataReporting')
+    end
+    def get(timeframe = nil, in_buckets_of = nil)
     end
 end
 
@@ -74,14 +72,16 @@ class AgentGroups < UserManagement
 end
 
 class Application
-    attr_reader :services, :tokens, :account_id
+    attr_reader :tokens, :account_id
     def initialize(account_id, tokens)
         @account_id = account_id
         @tokens = tokens
         @services = []
     end
-    def add_service(service)
-        @services << service
+    def oauth_sig
+        #consumer = OAuth::Consumer.new(@tokens[:consumer_key], @tokens[:consumer_secret], {:site=>'http://my.site'})
+        #accesstoken = OAuth::AccessToken.new(consumer, @tokens[:access_token], @tokens[:access_token_secret])
+        #return accesstoken.to_s
     end
 end
 
@@ -89,18 +89,6 @@ app = Application.new('89119334', {consumer_key: 'fdsafdsa',
                                    consumer_secret: 'fdsafdsa', 
                                    access_token: 'fdsafdsa', 
                                    access_token_secret: 'fdsafdsa'})
-s1 = EngagementHistory.new
-s1.get_base_uri(app.account_id)
-s2 = OperationalRealTime.new
-s2.get_base_uri(app.account_id)
-s3 = Users.new
-s3.get_base_uri(app.account_id)
-s4 = Agents.new(read_only = true)
-s4.get_base_uri(app.account_id)
-app.add_service(s1)
-app.add_service(s2)
-app.add_service(s3)
-app.add_service(s4)
-puts app.services
-puts app.tokens
-puts app.account_id
+users_api = Users.new
+users_api.get_base_uri(app.account_id)
+user_data = users_api.get
